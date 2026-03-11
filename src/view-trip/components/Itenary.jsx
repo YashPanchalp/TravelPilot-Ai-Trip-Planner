@@ -43,25 +43,33 @@ function Itenary({trip}) {
         return text.toUpperCase().includes('INR') ? text : `INR ${text.replaceAll('$', '').trim()}`;
     };
 
-        const getMealType = (plan = {}) => {
-                const combined = `${plan?.placeName || ''} ${plan?.placeDetails || ''} ${plan?.time || ''} ${plan?.timeToVisit || ''} ${plan?.bestTimeToVisit || ''}`.toLowerCase();
+        const foodKeywords = ['restaurant', 'cafe', 'coffee', 'food', 'eat', 'dining', 'bistro', 'diner', 'eatery', 'kitchen', 'grill', 'bakery', 'pizzeria', 'noodles', 'sushi', 'thai', 'indian', 'chinese', 'italian', 'mexican', 'seafood', 'bar', 'street food', 'dhaba'];
 
-                // Direct keyword matching for meals
+        const getPlanSearchText = (plan = {}) => `${plan?.placeName || ''} ${plan?.placeDetails || ''} ${plan?.time || ''} ${plan?.timeToVisit || ''} ${plan?.bestTimeToVisit || ''}`.toLowerCase();
+
+        const isFoodPlan = (plan = {}) => {
+            const combined = getPlanSearchText(plan);
+            return foodKeywords.some((keyword) => combined.includes(keyword))
+                || combined.includes('breakfast')
+                || combined.includes('lunch')
+                || combined.includes('dinner')
+                || combined.includes('brunch')
+                || combined.includes('supper');
+        };
+
+        const getMealType = (plan = {}) => {
+                const combined = getPlanSearchText(plan);
+
                 if (combined.includes('breakfast') || combined.includes('brunch')) return 'breakfast';
                 if (combined.includes('lunch')) return 'lunch';
                 if (combined.includes('dinner') || combined.includes('supper')) return 'dinner';
 
-                // Food-related keywords that might indicate a restaurant/food place
-                const foodKeywords = ['restaurant', 'cafe', 'coffee', 'food', 'eat', 'dining', 'bistro', 'diner', 'eatery', 'kitchen', 'grill', 'bakery', 'pizzeria', 'noodles', 'sushi', 'thai', 'indian', 'chinese', 'italian', 'mexican', 'seafood', 'bar & grill'];
-                const isFoodPlace = foodKeywords.some(keyword => combined.includes(keyword));
+                if (!isFoodPlan(plan)) return null;
 
-                if (!isFoodPlace) return null;
-
-                // If it's a food place, try to infer meal type from time
                 const timeMatch = /(\d{1,2})(?::(\d{2}))?\s?(?:am|pm)?/i.exec(combined);
                 if (timeMatch) {
                     let hour = Number(timeMatch[1]);
-                    const isPm = combined.includes('pm') || (hour < 12 && combined.includes('afternoon')) || (hour < 12 && combined.includes('evening'));
+                    const isPm = combined.includes('pm') || (hour < 12 && (combined.includes('afternoon') || combined.includes('evening')));
                     const hour24 = isPm && hour !== 12 ? hour + 12 : hour;
 
                     if (hour24 >= 6 && hour24 < 11) return 'breakfast';
@@ -69,13 +77,117 @@ function Itenary({trip}) {
                     if (hour24 >= 16 && hour24 < 23) return 'dinner';
                 }
 
-                // Infer from day part context if mentioned
                 if (combined.includes('morning')) return 'breakfast';
                 if (combined.includes('afternoon')) return 'lunch';
                 if (combined.includes('evening') || combined.includes('night')) return 'dinner';
 
-                // Default: if no other hints, assume it's a lunch/dinner spot
                 return null;
+        };
+
+        const normalizePlaceName = (name = '') => String(name).toLowerCase().replaceAll(/[^a-z0-9]/g, ' ').replaceAll(/\s+/g, ' ').trim();
+
+        const buildLocalFallbackMeal = ({ mealType, dayIndex, destinationLabel, activityPlans = [] }) => {
+            const city = String(destinationLabel || 'Local').split(',')[0].trim() || 'Local';
+            const nearby = activityPlans[dayIndex % Math.max(activityPlans.length, 1)]?.placeName || activityPlans[0]?.placeName || city;
+
+            const namePool = {
+                breakfast: ['Old Town Breakfast Cafe', 'Morning Tiffin House', 'Sunrise Bakery & Tea Room'],
+                lunch: ['City Spice Lunch House', 'Heritage Thali Kitchen', 'Market Street Eatery'],
+                dinner: ['Riverside Dinner Bistro', 'Local Flavors Restaurant', 'Night Bazaar Grill'],
+            };
+
+            const timePool = {
+                breakfast: '8:00 AM',
+                lunch: '1:00 PM',
+                dinner: '8:00 PM',
+            };
+
+            const costPool = {
+                breakfast: 'INR 150 - 350',
+                lunch: 'INR 250 - 600',
+                dinner: 'INR 350 - 900',
+            };
+
+            const choice = namePool[mealType][dayIndex % namePool[mealType].length];
+
+            return {
+                placeName: `${city} ${choice}`,
+                placeDetails: `Popular local ${mealType} place near ${nearby}. Added to complete your daily meal plan.`,
+                placeAddress: `${nearby} area, ${city}`,
+                time: timePool[mealType],
+                timeToVisit: mealType === 'breakfast' ? 'Morning' : mealType === 'lunch' ? 'Afternoon' : 'Evening',
+                ticketPricing: costPool[mealType],
+                timeToTravel: '10-25 mins',
+                placeImageUrl: '',
+                geoCoordinates: '',
+            };
+        };
+
+        const buildLocalFallbackActivity = ({ dayIndex, destinationLabel, existingActivities = [] }) => {
+            const city = String(destinationLabel || 'Local').split(',')[0].trim() || 'Local';
+            const nearby = existingActivities[dayIndex % Math.max(existingActivities.length, 1)]?.placeName || city;
+
+            const activityPool = [
+                {
+                    placeName: `${city} Old Town Walk`,
+                    placeDetails: `Explore heritage streets, markets, and local architecture around ${nearby}.`,
+                    time: '10:00 AM',
+                    timeToVisit: 'Morning',
+                    ticketPricing: 'INR 0 - 200',
+                },
+                {
+                    placeName: `${city} Local Art & Culture Spot`,
+                    placeDetails: `A cultural stop with local stories, crafts, and photo-friendly spaces in ${city}.`,
+                    time: '2:00 PM',
+                    timeToVisit: 'Afternoon',
+                    ticketPricing: 'INR 100 - 400',
+                },
+                {
+                    placeName: `${city} Sunset Viewpoint`,
+                    placeDetails: `Catch evening views and local vibe near ${nearby}. Great for a relaxed end to the day.`,
+                    time: '6:30 PM',
+                    timeToVisit: 'Evening',
+                    ticketPricing: 'INR 0 - 300',
+                },
+            ];
+
+            const picked = activityPool[dayIndex % activityPool.length];
+            return {
+                ...picked,
+                placeAddress: `${nearby}, ${city}`,
+                timeToTravel: '10-30 mins',
+                placeImageUrl: '',
+                geoCoordinates: '',
+            };
+        };
+
+        const ensureMinimumActivities = (plans = [], context = {}) => {
+            const minActivitiesPerDay = 3;
+            const existing = [...plans];
+            const usedNames = new Set(existing.map((plan) => normalizePlaceName(plan?.placeName || '')));
+
+            while (existing.length < minActivitiesPerDay) {
+                const fallback = buildLocalFallbackActivity({
+                    dayIndex: context?.dayIndex || 0,
+                    destinationLabel: context?.destinationLabel,
+                    existingActivities: existing,
+                });
+
+                let name = fallback.placeName;
+                let suffix = 2;
+                while (usedNames.has(normalizePlaceName(name))) {
+                    name = `${fallback.placeName} ${suffix}`;
+                    suffix += 1;
+                }
+
+                existing.push({
+                    ...fallback,
+                    placeName: name,
+                });
+                usedNames.add(normalizePlaceName(name));
+            }
+
+            return existing;
         };
 
         const mealEmoji = {
@@ -96,55 +208,63 @@ function Itenary({trip}) {
             dinner: 'border-violet-200 bg-violet-50 text-violet-700',
         };
 
-        const buildMeals = (plans = []) => {
+        const buildMeals = (plans = [], context = {}) => {
                 const mealMap = {
                         breakfast: null,
                         lunch: null,
                         dinner: null,
                 };
+            const usedNames = new Set();
+
+            const assignMeal = (mealType, plan) => {
+                if (!plan || mealMap[mealType]) return false;
+                const normalizedName = normalizePlaceName(plan?.placeName || `${mealType}-${Math.random()}`);
+                if (usedNames.has(normalizedName)) return false;
+                mealMap[mealType] = plan;
+                usedNames.add(normalizedName);
+                return true;
+            };
 
                 // First pass: assign explicitly identified meals
                 plans.forEach((plan) => {
                         const type = getMealType(plan);
-                        if (type && !mealMap[type]) {
-                                mealMap[type] = plan;
+                if (type) {
+                    assignMeal(type, plan);
                         }
                 });
 
-                // Second pass: try to fill empty meal slots with other food places
-                const foodPlaces = plans.filter(plan => {
-                        const combined = `${plan?.placeName || ''} ${plan?.placeDetails || ''} ${plan?.time || ''} ${plan?.timeToVisit || ''} ${plan?.bestTimeToVisit || ''}`.toLowerCase();
-                        const foodKeywords = ['restaurant', 'cafe', 'coffee', 'food', 'eat', 'dining', 'bistro', 'diner', 'eatery', 'kitchen', 'grill', 'bakery', 'pizzeria', 'noodles', 'sushi', 'thai', 'indian', 'chinese', 'italian', 'mexican', 'seafood', 'bar & grill'];
-                        return foodKeywords.some(keyword => combined.includes(keyword));
+            // Second pass: assign untyped food places without repeating names
+            const foodPlaces = plans.filter((plan) => isFoodPlan(plan));
+            const remainingFoodPlaces = foodPlaces.filter((plan) => !usedNames.has(normalizePlaceName(plan?.placeName || '')));
+
+            ['breakfast', 'lunch', 'dinner'].forEach((mealType) => {
+                if (!mealMap[mealType]) {
+                const candidate = remainingFoodPlaces.find((plan) => !usedNames.has(normalizePlaceName(plan?.placeName || '')));
+                if (candidate) {
+                    assignMeal(mealType, candidate);
+                }
+                }
+            });
+
+            // Final pass: build local fallback meal places if still missing
+            ['breakfast', 'lunch', 'dinner'].forEach((mealType) => {
+                if (!mealMap[mealType]) {
+                const fallbackPlan = buildLocalFallbackMeal({
+                    mealType,
+                    dayIndex: context?.dayIndex || 0,
+                    destinationLabel: context?.destinationLabel,
+                    activityPlans: context?.activityPlans || [],
                 });
 
-                // Fill missing meal slots from available food places
-                if (!mealMap.breakfast && foodPlaces.length > 0) {
-                        const breakfast = foodPlaces.find(p => {
-                                const combined = `${p?.placeName || ''} ${p?.placeDetails || ''} ${p?.timeToVisit || ''} ${p?.bestTimeToVisit || ''}`.toLowerCase();
-                                return combined.includes('morning') || /^(6|7|8|9|10)(\s|:|am)/i.test(combined);
-                        });
-                        if (breakfast) mealMap.breakfast = breakfast;
-                        else mealMap.breakfast = foodPlaces[0];
+                if (!assignMeal(mealType, fallbackPlan)) {
+                    const safePlan = {
+                    ...fallbackPlan,
+                    placeName: `${fallbackPlan.placeName} ${mealType === 'breakfast' ? 'Morning Spot' : mealType === 'lunch' ? 'Lunch Spot' : 'Dinner Spot'}`,
+                    };
+                    assignMeal(mealType, safePlan);
                 }
-
-                if (!mealMap.lunch && foodPlaces.length > 0) {
-                        const lunch = foodPlaces.find(p => {
-                                const combined = `${p?.placeName || ''} ${p?.placeDetails || ''} ${p?.timeToVisit || ''} ${p?.bestTimeToVisit || ''}`.toLowerCase();
-                                return combined.includes('afternoon') || /^(11|12|13|14|15)(\s|:|pm)?/i.test(combined);
-                        });
-                        if (lunch) mealMap.lunch = lunch;
-                        else if (foodPlaces.length > 1) mealMap.lunch = foodPlaces[1];
                 }
-
-                if (!mealMap.dinner && foodPlaces.length > 0) {
-                        const dinner = foodPlaces.find(p => {
-                                const combined = `${p?.placeName || ''} ${p?.placeDetails || ''} ${p?.timeToVisit || ''} ${p?.bestTimeToVisit || ''}`.toLowerCase();
-                                return combined.includes('evening') || combined.includes('night') || /^(18|19|20|21|22)(\s|:|pm)?/i.test(combined);
-                        });
-                        if (dinner) mealMap.dinner = dinner;
-                        else if (foodPlaces.length > 1) mealMap.dinner = foodPlaces[Math.min(foodPlaces.length - 1, 2)];
-                }
+            });
 
                 return mealMap;
         };
@@ -217,8 +337,16 @@ function Itenary({trip}) {
                         {itineraryItems.map((item, index) => {
                                 const dayPlans = normalizeDayPlans(item).filter((plan) => plan && typeof plan === 'object');
                                 const dayLabel = item?.day || item?.title || `Day ${index + 1}`;
-                                                                const mealMap = buildMeals(dayPlans);
-                                                                const activityPlans = dayPlans.filter((plan) => !getMealType(plan));
+                                const rawActivityPlans = dayPlans.filter((plan) => !isFoodPlan(plan));
+                                const activityPlans = ensureMinimumActivities(rawActivityPlans, {
+                                    dayIndex: index,
+                                    destinationLabel: trip?.userSelection?.location?.label,
+                                });
+                                const mealMap = buildMeals(dayPlans, {
+                                    dayIndex: index,
+                                    destinationLabel: trip?.userSelection?.location?.label,
+                                    activityPlans: rawActivityPlans,
+                                });
                                 const routePlaces = activityPlans.slice(0, 5);
                                 const routeStart = routePlaces[0]?.placeName || 'Start Point';
                                 const routeEnd = routePlaces.at(-1)?.placeName || 'End Point';
