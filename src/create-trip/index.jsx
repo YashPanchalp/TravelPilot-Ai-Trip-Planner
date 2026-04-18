@@ -67,7 +67,9 @@ const normalizeGoogleUser = (profile = {}) => ({
 
 function CreateTrip() {
   const [place, setPlace] = useState();
+  const [sourcePlace, setSourcePlace] = useState();
   const [formData, setFormData] = useState({
+    source: null,
     location: null,
     startDate: '',
     endDate: '',
@@ -312,8 +314,8 @@ function CreateTrip() {
 
     const days = Number(formData?.noOfDays);
 
-    if (!formData?.location || !formData?.travelers || !formData?.budget || !formData?.startDate || !formData?.endDate || !days) {
-      toast.error('Please fill all fields before generating the trip.');
+    if (!formData?.source || !formData?.location || !formData?.travelers || !formData?.budget || !formData?.startDate || !formData?.endDate || !days) {
+      toast.error('Please fill all fields including source location before generating the trip.');
       return;
     }
 
@@ -366,20 +368,49 @@ function CreateTrip() {
 
   return (
     <>
-      <section className='relative overflow-hidden px-4 py-8 sm:px-8 md:px-14 lg:px-20'>
-        <div className='pointer-events-none absolute -left-20 top-20 h-72 w-72 rounded-full bg-sky-200/35 blur-3xl' />
-        <div className='pointer-events-none absolute -right-24 top-40 h-80 w-80 rounded-full bg-violet-200/35 blur-3xl' />
+      <section className='relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-50 px-0 py-10 sm:px-0 md:px-0 lg:px-0'>
+        <div className='pointer-events-none absolute -left-32 top-10 h-80 w-80 rounded-full bg-sky-200/40 blur-3xl' />
+        <div className='pointer-events-none absolute -right-32 top-40 h-80 w-80 rounded-full bg-violet-200/40 blur-3xl' />
+        <div className='pointer-events-none absolute bottom-20 left-1/2 h-60 w-96 -translate-x-1/2 rounded-full bg-emerald-200/20 blur-3xl' />
 
-        <div className='relative mx-auto grid max-w-6xl grid-cols-1 gap-6 lg:grid-cols-[1.05fr_1fr]'>
-          <div className='rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-xl backdrop-blur-sm sm:p-7'>
-            <div className='mb-6 flex items-center gap-3'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-indigo-500 to-violet-500 text-lg font-bold text-white'>✦</div>
-              <h2 className='text-2xl font-extrabold text-slate-900'>Trip Details</h2>
+        <div className='relative mx-auto w-full'>
+          {/* Header Section */}
+          <div className='mb-8 px-4 text-center sm:mb-10 sm:px-8 md:px-14 lg:px-20'>
+            <p className='text-xs font-bold uppercase tracking-[0.3em] text-indigo-600'>✨ AI Travel Planner</p>
+            <h1 className='mt-2 text-3xl font-bold text-slate-900 sm:text-4xl'>Plan Your Perfect Trip</h1>
+            <p className='mt-3 text-sm text-slate-600 sm:text-base'>Let AI create a personalized itinerary based on your preferences and interests</p>
+          </div>
+
+          {/* Form and Preview Grid */}
+          <div className='grid gap-8 px-4 sm:px-8 md:px-14 lg:px-20 lg:grid-cols-[1.1fr_1fr]'>
+          <div className='rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white/95 p-8 shadow-xl backdrop-blur-sm'>
+            <div className='mb-2 flex items-center gap-3'>
+              <div className='flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 text-lg font-bold text-white'>✈</div>
+              <div>
+                <h2 className='text-2xl font-bold text-slate-900'>Create Your Trip</h2>
+                <p className='text-xs text-slate-500'>Personalized AI-powered itinerary</p>
+              </div>
             </div>
 
-            <div className='space-y-5'>
+            <div className='mt-8 space-y-6'>
               <div>
-                <h3 className='mb-2 text-sm font-semibold text-slate-700'>Where do you want to go?</h3>
+                <h3 className='mb-3 text-sm font-bold uppercase tracking-wide text-slate-700'>📍 Where are you traveling from?</h3>
+                <GooglePlacesAutocomplete
+                  apiKey={import.meta.env.VITE_GOOGLE_PLACES_API_KEY}
+                  selectProps={{
+                    value: sourcePlace,
+                    placeholder: 'e.g., New York, London, Mumbai...',
+                    styles: placeSelectStyles,
+                    onChange: (v) => {
+                      setSourcePlace(v);
+                      handleInputChange('source', v);
+                    },
+                  }}
+                />
+              </div>
+
+              <div>
+                <h3 className='mb-3 text-sm font-bold uppercase tracking-wide text-slate-700'>✈️ Where do you want to go?</h3>
                 <GooglePlacesAutocomplete
                   apiKey={import.meta.env.VITE_GOOGLE_PLACES_API_KEY}
                   selectProps={{
@@ -394,11 +425,11 @@ function CreateTrip() {
                 />
               </div>
 
-              <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
+              <div className='grid grid-cols-1 gap-5 sm:grid-cols-2'>
                 <div>
-                  <h3 className='mb-2 text-sm font-semibold text-slate-700'>Start Date</h3>
+                  <h3 className='mb-3 text-sm font-bold uppercase tracking-wide text-slate-700'>📅 Start Date</h3>
                   <Input
-                    className='h-11 rounded-xl border-slate-300 bg-white'
+                    className='h-12 rounded-xl border-slate-300 bg-white text-base font-medium transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100'
                     type='date'
                     value={formData?.startDate || ''}
                     onChange={(e) => handleInputChange('startDate', e.target.value)}
@@ -406,9 +437,9 @@ function CreateTrip() {
                 </div>
 
                 <div>
-                  <h3 className='mb-2 text-sm font-semibold text-slate-700'>End Date</h3>
+                  <h3 className='mb-3 text-sm font-bold uppercase tracking-wide text-slate-700'>📅 End Date</h3>
                   <Input
-                    className='h-11 rounded-xl border-slate-300 bg-white'
+                    className='h-12 rounded-xl border-slate-300 bg-white text-base font-medium transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100'
                     type='date'
                     value={formData?.endDate || ''}
                     onChange={(e) => handleInputChange('endDate', e.target.value)}
@@ -416,11 +447,11 @@ function CreateTrip() {
                 </div>
               </div>
 
-              <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
+              <div className='grid grid-cols-1 gap-5 sm:grid-cols-2'>
                 <div>
-                  <h3 className='mb-2 text-sm font-semibold text-slate-700'>Travelers</h3>
+                  <h3 className='mb-3 text-sm font-bold uppercase tracking-wide text-slate-700'>👥 Travelers</h3>
                   <select
-                    className='h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm font-medium text-slate-800'
+                    className='h-12 w-full rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100'
                     value={formData?.travelers || ''}
                     onChange={(e) => handleInputChange('travelers', e.target.value)}
                   >
@@ -432,9 +463,9 @@ function CreateTrip() {
                 </div>
 
                 <div>
-                  <h3 className='mb-2 text-sm font-semibold text-slate-700'>Trip Duration</h3>
+                  <h3 className='mb-3 text-sm font-bold uppercase tracking-wide text-slate-700'>⏱️ Trip Duration</h3>
                   <Input
-                    className='h-11 rounded-xl border-slate-300 bg-slate-100 font-semibold text-slate-700'
+                    className='h-12 rounded-xl border-slate-300 bg-gradient-to-r from-indigo-50 to-violet-50 text-base font-bold text-slate-800'
                     value={formData?.noOfDays ? `${formData?.noOfDays} day(s)` : ''}
                     placeholder='Auto calculated from dates'
                     disabled
@@ -443,38 +474,39 @@ function CreateTrip() {
               </div>
 
               <div>
-                <h3 className='mb-2 text-sm font-semibold text-slate-700'>Budget Preference</h3>
-                <div className='grid grid-cols-1 gap-3 sm:grid-cols-3'>
+                <h3 className='mb-4 text-sm font-bold uppercase tracking-wide text-slate-700'>💸 Budget Preference</h3>
+                <div className='grid grid-cols-1 gap-4 sm:grid-cols-3'>
                   {SelectBudgetoptions.map((item) => (
                     <button
                       key={item.id}
                       type='button'
                       onClick={() => handleInputChange('budget', item.title)}
-                      className={`rounded-xl border px-3 py-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm ${
+                      className={`group rounded-2xl border-2 px-4 py-5 text-left transition-all duration-300 ${
                         formData?.budget === item.title
-                          ? 'border-indigo-600 bg-indigo-50 text-indigo-800'
-                          : 'border-slate-300 bg-white text-slate-700'
+                          ? 'border-indigo-600 bg-gradient-to-br from-indigo-50 to-violet-50 text-indigo-900'
+                          : 'border-slate-200 bg-white text-slate-700 hover:-translate-y-1 hover:shadow-lg'
                       }`}
                     >
-                      <p className='text-lg'>{item.icon}</p>
-                      <p className='mt-1 text-sm font-bold'>{item.title}</p>
+                      <p className='text-3xl'>{item.icon}</p>
+                      <p className='mt-3 text-sm font-bold leading-snug'>{item.title}</p>
+                      <p className='mt-2 text-xs text-slate-600 group-hover:text-slate-700'>{item.desc}</p>
                     </button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <h3 className='mb-2 text-sm font-semibold text-slate-700'>What interests you?</h3>
-                <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
+                <h3 className='mb-4 text-sm font-bold uppercase tracking-wide text-slate-700'>🎯 What interests you?</h3>
+                <div className='grid grid-cols-2 gap-3'>
                   {SelectInterestOptions.map((item) => (
                     <button
                       key={item.id}
                       type='button'
                       onClick={() => toggleInterest(item.title)}
-                      className={`rounded-xl border px-3 py-2.5 text-left text-sm font-medium transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm ${
+                      className={`rounded-xl border-2 px-4 py-3 text-center text-sm font-semibold transition-all duration-300 ${
                         (formData?.interests || []).includes(item.title)
-                          ? 'border-violet-500 bg-violet-50 text-violet-800'
-                          : 'border-slate-300 bg-white text-slate-700'
+                          ? 'border-violet-500 bg-gradient-to-br from-violet-50 to-purple-50 text-violet-900'
+                          : 'border-slate-200 bg-white text-slate-700 hover:-translate-y-0.5 hover:shadow-sm'
                       }`}
                     >
                       {item.title}
@@ -484,9 +516,9 @@ function CreateTrip() {
               </div>
 
               <div>
-                <h3 className='mb-2 text-sm font-semibold text-slate-700'>Your Preference (Optional)</h3>
+                <h3 className='mb-3 text-sm font-bold uppercase tracking-wide text-slate-700'>💬 Your Preference (Optional)</h3>
                 <textarea
-                  className='min-h-24 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100'
+                  className='min-h-28 w-full rounded-xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 placeholder-slate-400 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100'
                   placeholder='Example: Prefer less walking, vegetarian food, kid-friendly places, nightlife, shopping, museums, etc.'
                   value={formData?.userPreference || ''}
                   onChange={(e) => handleInputChange('userPreference', e.target.value)}
@@ -494,35 +526,111 @@ function CreateTrip() {
               </div>
             </div>
 
-            <div className='mt-7'>
+            <div className='mt-8 pt-6 border-t border-slate-200'>
               <Button
                 disabled={loading}
-                className='h-12 w-full rounded-xl bg-linear-to-r from-indigo-500 to-violet-500 text-base font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-violet-500/30'
+                className='h-14 w-full rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-base font-bold text-white shadow-lg shadow-indigo-500/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-violet-500/40 disabled:opacity-75 disabled:cursor-not-allowed'
                 onClick={OnGenerateTrp}
               >
-                {loading ? <AiOutlineLoading3Quarters className='animate-spin' /> : 'Generate AI Trip Plan'}
+                {loading ? <AiOutlineLoading3Quarters className='animate-spin' /> : '🚀 Generate AI Trip Plan'}
               </Button>
             </div>
           </div>
 
-          <div className='rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-xl backdrop-blur-sm'>
-            <div className='mx-auto mt-14 flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100 text-2xl text-indigo-600'>◉</div>
-            <h3 className='mt-8 text-center text-2xl font-extrabold text-slate-900'>Your AI-Generated Itinerary</h3>
-            <p className='mt-3 text-center text-sm text-slate-600'>Fill out trip details and click "Generate AI Trip Plan" to create a weather-aware itinerary with INR-only estimated cost.</p>
+          <div className='rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white/95 p-8 shadow-xl backdrop-blur-sm'>
+            <div className='mb-2 flex items-center gap-2'>
+              <div className='h-1 w-8 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500' />
+              <p className='text-xs font-bold uppercase tracking-widest text-indigo-600'>Preview</p>
+            </div>
+            <h3 className='text-2xl font-bold text-slate-900'>Trip Summary</h3>
+            <p className='mt-2 text-sm text-slate-600'>Your itinerary details will appear here</p>
 
-            <div className='mt-8 rounded-2xl border border-slate-200 bg-slate-50/70 p-4'>
-              <p className='text-xs font-semibold uppercase tracking-wide text-slate-500'>Live Preview</p>
-              <div className='mt-3 space-y-2 text-sm text-slate-700'>
-                <p><span className='font-semibold text-slate-900'>Destination:</span> {formData?.location?.label || 'Not selected'}</p>
-                <p><span className='font-semibold text-slate-900'>Dates:</span> {formData?.startDate || '--'} to {formData?.endDate || '--'}</p>
-                <p><span className='font-semibold text-slate-900'>Days:</span> {formData?.noOfDays || '--'}</p>
-                <p><span className='font-semibold text-slate-900'>Travelers:</span> {formData?.travelers || '--'}</p>
-                <p><span className='font-semibold text-slate-900'>Budget:</span> {formData?.budget || '--'}</p>
-                <p><span className='font-semibold text-slate-900'>Interests:</span> {(formData?.interests || []).join(', ') || '--'}</p>
-                <p><span className='font-semibold text-slate-900'>Preference:</span> {(formData?.userPreference || '').trim() || '--'}</p>
+            <div className='mt-8 space-y-5'>
+              {/* Source Location */}
+              <div className='rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:shadow-md'>
+                <p className='text-xs font-bold uppercase tracking-wide text-slate-500'>📍 From</p>
+                <p className='mt-2 text-lg font-semibold text-slate-900'>{formData?.source?.label || 'Not selected'}</p>
+              </div>
+
+              {/* Destination */}
+              <div className='rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:shadow-md'>
+                <p className='text-xs font-bold uppercase tracking-wide text-slate-500'>✈️ To</p>
+                <p className='mt-2 text-lg font-semibold text-slate-900'>{formData?.location?.label || 'Not selected'}</p>
+              </div>
+
+              {/* Trip Dates & Duration */}
+              <div className='grid grid-cols-2 gap-3'>
+                <div className='rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:shadow-md'>
+                  <p className='text-xs font-bold uppercase tracking-wide text-slate-500'>📅 Start</p>
+                  <p className='mt-2 text-sm font-semibold text-slate-900'>{formData?.startDate || '--'}</p>
+                </div>
+                <div className='rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:shadow-md'>
+                  <p className='text-xs font-bold uppercase tracking-wide text-slate-500'>📅 End</p>
+                  <p className='mt-2 text-sm font-semibold text-slate-900'>{formData?.endDate || '--'}</p>
+                </div>
+              </div>
+
+              {/* Trip Duration & Travelers */}
+              <div className='grid grid-cols-2 gap-3'>
+                <div className='rounded-2xl border border-slate-200 bg-gradient-to-br from-indigo-50 to-violet-50 p-4 transition-all hover:shadow-md'>
+                  <p className='text-xs font-bold uppercase tracking-wide text-indigo-600'>⏱️ Duration</p>
+                  <p className='mt-2 text-lg font-bold text-indigo-900'>{formData?.noOfDays ? `${formData?.noOfDays} Days` : '--'}</p>
+                </div>
+                <div className='rounded-2xl border border-slate-200 bg-gradient-to-br from-violet-50 to-purple-50 p-4 transition-all hover:shadow-md'>
+                  <p className='text-xs font-bold uppercase tracking-wide text-violet-600'>👥 Travelers</p>
+                  <p className='mt-2 text-lg font-bold text-violet-900'>{formData?.travelers || '--'}</p>
+                </div>
+              </div>
+
+              {/* Budget */}
+              <div className='rounded-2xl border border-slate-200 bg-gradient-to-br from-amber-50 to-orange-50 p-4 transition-all hover:shadow-md'>
+                <p className='text-xs font-bold uppercase tracking-wide text-amber-600'>💸 Budget</p>
+                <div className='mt-2 flex items-center gap-3'>
+                  <span className='text-2xl'>{formData?.budget ? (formData?.budget === 'Pocket Friendly' ? '🪙' : formData?.budget === 'Moderate' ? '💰' : '💎') : '❓'}</span>
+                  <p className='text-lg font-bold text-amber-900'>{formData?.budget || 'Not selected'}</p>
+                </div>
+              </div>
+
+              {/* Interests */}
+              {(formData?.interests || []).length > 0 && (
+                <div className='rounded-2xl border border-slate-200 bg-white p-4'>
+                  <p className='text-xs font-bold uppercase tracking-wide text-slate-500'>🎯 Interests</p>
+                  <div className='mt-3 flex flex-wrap gap-2'>
+                    {(formData?.interests || []).map((interest) => (
+                      <span key={interest} className='inline-flex items-center rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-800'>
+                        {interest}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* User Preference */}
+              {(formData?.userPreference || '').trim() && (
+                <div className='rounded-2xl border border-slate-200 bg-white p-4'>
+                  <p className='text-xs font-bold uppercase tracking-wide text-slate-500'>💬 Your Preference</p>
+                  <p className='mt-2 text-sm text-slate-700 italic'>{formData?.userPreference}</p>
+                </div>
+              )}
+
+              {/* Status Indicator */}
+              <div className='rounded-2xl border border-slate-300 bg-gradient-to-r from-slate-100 to-slate-50 p-4'>
+                <div className='flex items-center gap-2'>
+                  <div className={`h-2 w-2 rounded-full ${
+                    formData?.location && formData?.travelers && formData?.budget && formData?.startDate && formData?.endDate 
+                      ? 'bg-green-500' 
+                      : 'bg-amber-400'
+                  }`} />
+                  <p className='text-xs font-semibold text-slate-600'>
+                    {formData?.location && formData?.travelers && formData?.budget && formData?.startDate && formData?.endDate 
+                      ? '✓ Ready to generate' 
+                      : '○ Complete the form'}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
+        </div>
         </div>
       </section>
 

@@ -7,7 +7,7 @@ import image from '../../assets/image.png'
 
 
 
-function HotelCardItem({hotel}) {
+function HotelCardItem({hotel, isSelected, onSelect}) {
 
   const formatInr = (value) => {
     if (!value) return 'INR N/A';
@@ -55,12 +55,13 @@ function HotelCardItem({hotel}) {
     }
   return (
     <article className='group h-full'>
-        <Link
-            to={'https://www.google.com/maps/search/?api=1&query=' + hotel?.hotelName}
-            target="_blank"
-            rel="noopener noreferrer"
+        <div
+            className={`flex h-full flex-col overflow-hidden rounded-xl border-2 transition-all duration-500 transform-gpu hover:-translate-y-1 hover:rotate-[0.25deg] sm:rounded-2xl ${
+              isSelected 
+                ? 'border-emerald-500 bg-gradient-to-b from-emerald-50 to-white shadow-[0_30px_70px_-28px_rgba(16,185,129,0.5)]' 
+                : 'border-slate-200 bg-white shadow-[0_20px_46px_-24px_rgba(15,23,42,0.36)] hover:shadow-[0_30px_70px_-28px_rgba(79,70,229,0.45)]'
+            }`}
         >
-        <div className='flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_20px_46px_-24px_rgba(15,23,42,0.36)] transition-all duration-500 transform-gpu hover:-translate-y-1 hover:rotate-[0.25deg] hover:shadow-[0_30px_70px_-28px_rgba(79,70,229,0.45)] sm:rounded-2xl'>
             <div className='relative'>
             <img
               src={photoUrl}
@@ -72,7 +73,9 @@ function HotelCardItem({hotel}) {
               }}
             />
             <div className='absolute inset-0 bg-linear-to-t from-slate-900/60 via-slate-800/10 to-transparent' />
-            <div className='absolute left-3 top-3 rounded-full border border-white/50 bg-white/20 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur sm:left-4 sm:top-4 sm:px-3 sm:text-xs'>✨ Top Stay Pick</div>
+            <div className={`absolute left-3 top-3 rounded-full border ${isSelected ? 'border-emerald-300 bg-emerald-500/90' : 'border-white/50 bg-white/20'} px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur sm:left-4 sm:top-4 sm:px-3 sm:text-xs transition-all`}>
+              {isSelected ? '✓ Selected' : '✨ Top Pick'}
+            </div>
             </div>
 
             <div className='flex flex-1 min-w-0 flex-col gap-3 p-4 sm:p-5'>
@@ -82,19 +85,35 @@ function HotelCardItem({hotel}) {
 
             <div className='flex flex-wrap gap-2'>
               <span className='rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700'>
-                💰 Price: {formatInr(hotel?.price)}
+                💰 {formatInr(hotel?.price)}/night
               </span>
               <span className='rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700'>
-                ⭐ Rating: {hotel?.rating || 'N/A'}
+                ⭐ {hotel?.rating || 'N/A'}
               </span>
             </div>
 
-            <span className='mt-auto inline-flex w-fit rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 transition-colors duration-300 group-hover:bg-indigo-50 group-hover:text-indigo-700'>
-              View On Map ↗
-            </span>
+            <div className='mt-auto flex gap-2 pt-2'>
+              <button
+                onClick={onSelect}
+                className={`flex-1 rounded-lg px-3 py-2 text-xs font-bold transition-all duration-300 ${
+                  isSelected
+                    ? 'border border-emerald-500 bg-emerald-500 text-white hover:bg-emerald-600'
+                    : 'border border-slate-300 bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                {isSelected ? '✓ Selected' : 'Select Hotel'}
+              </button>
+              <a
+                href={'https://www.google.com/maps/search/?api=1&query=' + hotel?.hotelName}
+                target="_blank"
+                rel="noopener noreferrer"
+                className='flex-1 inline-flex justify-center rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 transition-colors duration-300 hover:bg-indigo-50 hover:text-indigo-700'
+              >
+                View Map ↗
+              </a>
+            </div>
             </div>
         </div>
-        </Link>
 
     </article>
   )

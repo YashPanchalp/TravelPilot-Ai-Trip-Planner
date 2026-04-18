@@ -226,7 +226,11 @@ function GeneratingTrip() {
   }, [navigate, tripSelection]);
 
   return (
-    <section className='relative min-h-[calc(100vh-72px)] overflow-hidden bg-[radial-gradient(circle_at_20%_20%,rgba(14,165,233,0.2),transparent_45%),radial-gradient(circle_at_80%_30%,rgba(99,102,241,0.24),transparent_46%),radial-gradient(circle_at_50%_90%,rgba(16,185,129,0.2),transparent_48%),#f8fafc]'>
+    <section className='relative min-h-[calc(100vh-72px)] overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-50'>
+      <div className='pointer-events-none absolute -left-32 top-10 h-80 w-80 rounded-full bg-sky-200/40 blur-3xl' />
+      <div className='pointer-events-none absolute -right-32 top-1/3 h-80 w-80 rounded-full bg-violet-200/40 blur-3xl' />
+      <div className='pointer-events-none absolute bottom-0 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-emerald-200/20 blur-3xl' />
+
       <style>{`
         @keyframes fly {
           0% { transform: translateX(-18vw) translateY(8px) rotateY(0deg) rotateZ(-6deg); }
@@ -245,35 +249,69 @@ function GeneratingTrip() {
           50% { transform: scale(1.02); opacity: 1; }
           100% { transform: scale(0.98); opacity: 0.75; }
         }
+
+        @keyframes slideUp {
+          from { transform: translateY(20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
       `}</style>
 
-      <div className='mx-auto flex min-h-[calc(100vh-72px)] max-w-4xl items-center px-4 py-12 sm:px-6'>
-        <div className='w-full rounded-3xl border border-white/60 bg-white/65 p-6 shadow-[0_30px_90px_-35px_rgba(15,23,42,0.45)] backdrop-blur-xl sm:p-10'>
-          <p className='text-center text-xs font-bold uppercase tracking-[0.22em] text-indigo-600'>AI Route Engine</p>
-          <h1 className='mt-4 text-center text-2xl font-extrabold text-slate-900 sm:text-4xl'>Generating trip to {destination}</h1>
-          <p className='mx-auto mt-3 max-w-2xl text-center text-sm text-slate-600 sm:text-base'>{statusText}</p>
+      <div className='mx-auto flex min-h-[calc(100vh-72px)] max-w-2xl items-center px-4 py-12 sm:px-6'>
+        <div className='w-full rounded-3xl border border-white/60 bg-white/70 p-8 shadow-2xl backdrop-blur-2xl sm:p-12'>
+          {/* Header */}
+          <div className='text-center'>
+            <p className='text-xs font-bold uppercase tracking-[0.22em] text-indigo-600 animate-pulse'>🔄 Processing</p>
+            <h1 className='mt-4 text-3xl font-bold text-slate-900 sm:text-4xl'>Generating Your Perfect Trip</h1>
+            <p className='mt-2 text-sm text-slate-600 sm:text-base'>to <span className='font-semibold text-indigo-600'>{destination}</span></p>
+          </div>
 
-          <div className='relative mt-10 h-40 overflow-hidden rounded-2xl border border-indigo-100 bg-white/80 sm:h-48'>
-            <div className='absolute left-1/2 top-1/2 h-1.5 w-64 -translate-x-1/2 rounded-full bg-linear-to-r from-sky-200 via-indigo-200 to-emerald-200' style={{ animation: 'trail 2.4s ease-in-out infinite' }} />
+          {/* Status Indicator */}
+          <div className='relative mt-12 h-40 overflow-hidden rounded-2xl border border-indigo-100/60 bg-gradient-to-b from-white/80 to-slate-50/60 backdrop-blur-sm sm:h-48'>
+            <div className='absolute left-1/2 top-1/2 h-1.5 w-64 -translate-x-1/2 rounded-full bg-gradient-to-r from-sky-300 via-indigo-300 to-emerald-300' style={{ animation: 'trail 2.4s ease-in-out infinite' }} />
             <div
-              className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl drop-shadow-[0_10px_10px_rgba(79,70,229,0.35)] sm:text-6xl'
+              className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-6xl drop-shadow-[0_10px_20px_rgba(79,70,229,0.4)] sm:text-7xl'
               style={{ animation: 'fly 2.8s ease-in-out infinite' }}
             >
               ✈️
             </div>
-            <div className='absolute inset-x-0 bottom-4 text-center text-xs font-semibold text-slate-500 sm:text-sm'>Calibrating routes, food stops, and budget fit...</div>
+            <div className='absolute inset-x-0 bottom-4 flex justify-center'>
+              <p className='text-xs font-semibold text-slate-600 sm:text-sm'>Crafting your itinerary with AI intelligence...</p>
+            </div>
           </div>
 
+          {/* Current Status */}
+          <div className='mt-8 rounded-2xl border border-slate-200 bg-gradient-to-r from-indigo-50 to-violet-50 px-6 py-4'>
+            <p className='text-center text-sm font-medium text-slate-700'>
+              <span className='inline-block animate-bounce mr-2'>⚡</span>
+              {statusText}
+              <span className='inline-block animate-bounce ml-2'>⚡</span>
+            </p>
+          </div>
+
+          {/* Processing Steps */}
           <div className='mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3'>
             {[
-              'Weather-aware activities',
-              'Local hotels and transport',
-              'Morning to night flow',
-            ].map((item) => (
-              <div key={item} className='rounded-xl border border-slate-200 bg-white px-4 py-3 text-center text-xs font-semibold text-slate-700 sm:text-sm' style={{ animation: 'pulseSoft 2.6s ease-in-out infinite' }}>
-                {item}
+              { icon: '🌦️', text: 'Weather-aware activities' },
+              { icon: '🏨', text: 'Hotels & transport' },
+              { icon: '🍽️', text: 'Morning to night flow' },
+            ].map((item, index) => (
+              <div 
+                key={item.text} 
+                className='rounded-xl border border-slate-200 bg-white px-4 py-4 text-center transition-all hover:shadow-md' 
+                style={{ 
+                  animation: `pulseSoft 2.6s ease-in-out infinite`,
+                  animationDelay: `${index * 0.2}s`
+                }}
+              >
+                <p className='text-2xl mb-2'>{item.icon}</p>
+                <p className='text-xs font-semibold text-slate-700 sm:text-sm'>{item.text}</p>
               </div>
             ))}
+          </div>
+
+          {/* Footer Note */}
+          <div className='mt-8 text-center'>
+            <p className='text-xs text-slate-500'>This typically takes 30-60 seconds. Please don't refresh the page.</p>
           </div>
         </div>
       </div>

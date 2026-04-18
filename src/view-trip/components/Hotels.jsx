@@ -1,7 +1,7 @@
 import React from 'react'
 import HotelCardItem from './HotelCardItem';
 
-function Hotels({trip}) {
+function Hotels({trip, onHotelSelect, selectedHotel, noOfDays}) {
   const limitedHotels = (trip?.tripData?.hotels || []).slice(0, 6);
 
   return (
@@ -18,6 +18,8 @@ function Hotels({trip}) {
             <HotelCardItem
               key={`${hotel?.hotelName || 'hotel'}-${hotel?.hotelAddress || 'address'}-${index}`}
               hotel={hotel}
+              isSelected={selectedHotel?.hotelName === hotel?.hotelName}
+              onSelect={() => onHotelSelect?.(hotel, noOfDays || 1)}
             />
             ))}
         </div>
