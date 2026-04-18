@@ -132,14 +132,30 @@ function MyTrips() {
   };
 
   const getEstimatedTotal = (trip) => {
-    const total =
-      trip?.tripData?.estimatedCostInr?.totalEstimatedCostInr ||
-      trip?.tripData?.estimatedCostInr?.total ||
-      trip?.tripData?.estimatedCost?.totalEstimatedCostInr ||
-      trip?.tripData?.estimatedCost?.total ||
-      0;
+    const travelersCount = trip?.userSelection?.travelers || 1;
+    const estimatedCost = trip?.tripData?.estimatedCostInr || trip?.tripData?.estimatedCost || {};
 
-    return parseAmount(total);
+    const extractNumeric = (val) => {
+        if (!val) return 0;
+        return Number.parseInt(String(val).replaceAll(/\D/g, '')) || 0;
+    };
+    
+    let total = 0;
+    total += extractNumeric(estimatedCost?.accommodationInr) * travelersCount;
+    total += extractNumeric(estimatedCost?.foodInr) * travelersCount;
+    total += extractNumeric(estimatedCost?.transportInr) * travelersCount;
+    total += extractNumeric(estimatedCost?.activitiesInr) * travelersCount;
+    total += extractNumeric(estimatedCost?.miscInr) * travelersCount;
+
+    if (total === 0) {
+      const fallbackTotal =
+        estimatedCost?.totalEstimatedCostInr ||
+        estimatedCost?.total ||
+        0;
+      return parseAmount(fallbackTotal);
+    }
+    
+    return total;
   };
 
   const getActivityTags = (trip) => {

@@ -639,7 +639,7 @@ const calculateDailyAverage = () => {
                       {costBreakdown?.hotelCostInr > 0 && (
                         <div className='flex justify-between'><span>🏨 Hotel (Total)</span><span className='font-bold'>₹{Number.parseInt(costBreakdown?.hotelCostInr || 0).toLocaleString('en-IN')}</span></div>
                       )}
-                      <div className='flex justify-between'><span>🍽️ Food{(tripData?.userSelection?.travelers || 1) > 1 ? ' (per person)' : ''}</span><span className='font-bold'>{inr(tripData?.tripData?.estimatedCostInr?.foodInr)}</span></div>
+                      <div className='flex justify-between'><span>�️ Food{(tripData?.userSelection?.travelers || 1) > 1 ? ' (per person)' : ''}</span><span className='font-bold'>{inr(tripData?.tripData?.estimatedCostInr?.foodInr)}</span></div>
                       <div className='flex justify-between'><span>🚕 Transport{(tripData?.userSelection?.travelers || 1) > 1 ? ' (per person)' : ''}</span><span className='font-bold'>{inr(tripData?.tripData?.estimatedCostInr?.transportInr)}</span></div>
                       <div className='flex justify-between'><span>🎭 Activities{(tripData?.userSelection?.travelers || 1) > 1 ? ' (per person)' : ''}</span><span className='font-bold'>{inr(tripData?.tripData?.estimatedCostInr?.activitiesInr)}</span></div>
                       <div className='flex justify-between'><span>📦 Misc{(tripData?.userSelection?.travelers || 1) > 1 ? ' (per person)' : ''}</span><span className='font-bold'>{inr(tripData?.tripData?.estimatedCostInr?.miscInr)}</span></div>
