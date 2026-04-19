@@ -82,7 +82,7 @@ export const chatSession = model.startChat({
  * Send message with automatic model fallback and retry logic
  * Tries multiple models in sequence with exponential backoff
  */
-//try out all three models to resolve errors 
+//try out all three models to resolve errors const apiKey = process.env.FLIGHTS_API_SERPAPI;
 export const sendMessageWithFallback = async (prompt) => {
   const models = ['gemini-2.0-flash', 'gemini-2.5-flash-lite', 'gemini-3.1-flash-lite-preview'];
   const maxRetries = 2;
