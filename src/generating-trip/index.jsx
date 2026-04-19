@@ -2,10 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { setDoc, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from '@/service/firebaseConfig';
 import { AI_PROMPT } from '@/constants/options';
-import { chatSession } from '@/service/AIModel';
+import { chatSession, getLocalTransportGuide, sendMessageWithFallback } from '@/service/AIModel';
 
 const WEATHER_CODE_LABEL = {
   0: 'Clear sky',
@@ -196,7 +196,7 @@ function GeneratingTrip() {
           .replace('{weatherSummary}', payload?.weatherSummary)
           .replace('{totalDays}', payload?.noOfDays);
 
-        const result = await chatSession.sendMessage(finalPrompt);
+        const result = await sendMessageWithFallback(finalPrompt);
 
         setStatusText('Finalizing hotels, costs, and route map...');
         const parsedTripData = JSON.parse(sanitizeJsonResponse(result?.response?.text() || ''));
@@ -209,6 +209,54 @@ function GeneratingTrip() {
           id: docId,
           createdAt: serverTimestamp(),
         });
+
+        // Start background transport guides generation asynchronously (fire-and-forget)
+        const runBackgroundTransportGuides = async (tripId, tripData, userSel) => {
+          try {
+            console.log('🔄 Starting background local transport generation...');
+            const city = userSel?.location?.label?.split(',')[0];
+            const date = userSel?.startDate;
+            const hotelName = tripData?.hotels?.[0]?.hotelName || 'Hotel';
+            
+            if (!tripData?.itinerary) return;
+
+            for (let i = 0; i < tripData.itinerary.length; i++) {
+              const dayData = tripData.itinerary[i];
+              if (!dayData?.plan || dayData.plan.length === 0) continue;
+              
+              const startTime = dayData.plan[0]?.time || '08:00 AM';
+              
+              try {
+                const guideResult = await getLocalTransportGuide({
+                  city,
+                  date,
+                  startTime,
+                  dayItinerary: dayData.plan,
+                  hotelName,
+                });
+                
+                if (guideResult) {
+                  // Push the individual day transport directly to the DB without breaking existing cache structures
+                  await updateDoc(doc(db, 'AiTrips', tripId), {
+                    [`transportGuides.day_${i}`]: {
+                      data: guideResult,
+                      generatedAt: new Date().toISOString(),
+                    }
+                  });
+                  console.log(`✅ Background transport guide saved for Day ${i + 1}`);
+                }
+              } catch (e) {
+                console.error(`Failed generating transport for day ${i + 1}:`, e);
+              }
+            }
+            console.log('🎉 Background transport generation complete!');
+          } catch (error) {
+            console.error('Fatal error in background transport generation:', error);
+          }
+        };
+
+        // Call without awaiting to keep the main user flow instantly responsive
+        runBackgroundTransportGuides(docId, parsedTripData, payload);
 
         setStatusText('Trip ready. Redirecting...');
         toast.success('Trip generated successfully!');

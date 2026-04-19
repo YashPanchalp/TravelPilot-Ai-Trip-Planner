@@ -327,9 +327,14 @@ function LocalTransportGuide({ trip, selectedDay = 0, tripId }) {
                   const isSelected = selectedSegment === idx;
                   const [fromText, toText] = segment.segment.split('→').map(s => s.trim());
                   
+                  // Determine fromInfo: First segment starts from Hotel, others start from previous place
                   let fromInfo = { type: '🏨 Hotel', name: 'Hotel' };
-                  let toInfo = { type: '🎯 Destination', name: 'Stop' };
+                  if (idx > 0 && idx - 1 < dayPlan.length) {
+                    fromInfo = getSegmentPlaceInfo(dayPlan[idx - 1]?.placeName, idx - 1);
+                  }
                   
+                  // Determine toInfo: Current place in itinerary
+                  let toInfo = { type: '🎯 Place', name: 'Stop' };
                   if (idx < dayPlan.length) {
                     toInfo = getSegmentPlaceInfo(dayPlan[idx]?.placeName, idx);
                   }
@@ -365,21 +370,18 @@ function LocalTransportGuide({ trip, selectedDay = 0, tripId }) {
                           <div className='flex items-start justify-between gap-3'>
                             <div className='flex-1 min-w-0'>
                               <p className='text-sm sm:text-base font-bold text-slate-900 mb-3'>{fromText} <span className='mx-1.5 text-blue-600 font-black'>→</span> {toText}</p>
-                              <div className='flex flex-wrap gap-2 mb-3'>
-                                <span className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 border border-blue-300 rounded-xl text-[11px] sm:text-xs font-bold text-blue-900 shadow-sm'>
-                                  {fromInfo.type}
-                                </span>
-                                <span className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 border border-emerald-300 rounded-xl text-[11px] sm:text-xs font-bold text-emerald-900 shadow-sm'>
-                                  {toInfo.type}
-                                </span>
-                              </div>
                               <div className='flex flex-wrap gap-2 text-[11px] sm:text-sm'>
-                                <span className='inline-flex items-center gap-2 px-3 py-1.5 bg-white/80 rounded-xl border border-slate-200 font-semibold text-slate-700 hover:bg-white transition-all'>
-                                  <span>📏</span> {segment.distance || 'N/A'}
-                                </span>
                                 <span className='inline-flex items-center gap-2 px-3 py-1.5 bg-white/80 rounded-xl border border-slate-200 font-semibold text-slate-700 hover:bg-white transition-all'>
                                   <Clock className='w-3.5 h-3.5' /> {segment.travelTime || 'N/A'}
                                 </span>
+                                <span className='inline-flex items-center gap-2 px-3 py-1.5 bg-white/80 rounded-xl border border-slate-200 font-semibold text-slate-700 hover:bg-white transition-all'>
+                                  <span>📏</span> {segment.distance || 'N/A'}
+                                </span>
+                                {segment.cost && (
+                                  <span className='inline-flex items-center gap-2 px-3 py-1.5 bg-white/80 rounded-xl border border-slate-200 font-semibold text-slate-700 hover:bg-white transition-all'>
+                                    <span>💰</span> {extractCost(segment.cost)}
+                                  </span>
+                                )}
                               </div>
                             </div>
                             <button 

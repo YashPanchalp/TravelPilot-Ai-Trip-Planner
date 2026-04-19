@@ -128,6 +128,7 @@ function MyTrips() {
   };
 
   const formatInr = (value) => {
+    if (Number.isNaN(value) || value == null) return 'INR 0';
     return `INR ${value.toLocaleString('en-IN')}`;
   };
 
@@ -137,22 +138,30 @@ function MyTrips() {
 
     const extractNumeric = (val) => {
         if (!val) return 0;
-        return Number.parseInt(String(val).replaceAll(/\D/g, '')) || 0;
+        const num = Number.parseInt(String(val).replaceAll(/,/g, '').replaceAll(/[^\d]/g, ''));
+        return Number.isNaN(num) ? 0 : num;
     };
     
     let total = 0;
-    total += extractNumeric(estimatedCost?.accommodationInr) * travelersCount;
-    total += extractNumeric(estimatedCost?.foodInr) * travelersCount;
-    total += extractNumeric(estimatedCost?.transportInr) * travelersCount;
-    total += extractNumeric(estimatedCost?.activitiesInr) * travelersCount;
-    total += extractNumeric(estimatedCost?.miscInr) * travelersCount;
+    total += extractNumeric(estimatedCost?.accommodationInr || estimatedCost?.accommodation);
+    total += extractNumeric(estimatedCost?.foodInr || estimatedCost?.food);
+    total += extractNumeric(estimatedCost?.transportInr || estimatedCost?.transport);
+    total += extractNumeric(estimatedCost?.activitiesInr || estimatedCost?.activities);
+    total += extractNumeric(estimatedCost?.miscInr || estimatedCost?.misc);
 
+    // Some models may return the total for just 1 person, some return the pre-multiplied total. 
+    // Usually, multiplying the sum by travelersCount is a bit inaccurate if the AI already did the math or if the user data already reflects group costs. Try without multiplying if not explicitly needed, or do it only if the value per person.
+    // The previous code multiplied everything by travelersCount even if AI already returned total sum.
+    
+    // Instead of forcing travelers count multiplication here (which might blow up if AI already did it), we just parse the total the AI gave.
     if (total === 0) {
       const fallbackTotal =
         estimatedCost?.totalEstimatedCostInr ||
+        estimatedCost?.totalEstimatedCost ||
         estimatedCost?.total ||
         0;
-      return parseAmount(fallbackTotal);
+      const numFallback = extractNumeric(fallbackTotal);
+      return numFallback > 0 ? numFallback : 0;
     }
     
     return total;
@@ -203,7 +212,10 @@ function MyTrips() {
   const stats = useMemo(() => {
     const upcoming = trips.filter((trip) => getTripStatus(trip) === 'upcoming').length;
     const completed = trips.filter((trip) => getTripStatus(trip) === 'completed').length;
-    const totalSpent = trips.reduce((sum, trip) => sum + getEstimatedTotal(trip), 0);
+    const totalSpent = trips.reduce((sum, trip) => {
+      const estimated = getEstimatedTotal(trip);
+      return sum + (Number.isNaN(estimated) ? 0 : estimated);
+    }, 0);
 
     return {
       total: trips.length,

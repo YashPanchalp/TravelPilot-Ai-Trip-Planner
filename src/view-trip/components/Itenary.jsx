@@ -11,22 +11,22 @@ function Itenary({trip, additionalCostBreakdown = {}, travelers = 1, expenseOnly
       ...additionalCostBreakdown,
     };
     const dayColorPalette = [
-        { bg: 'from-amber-50 to-orange-50', border: 'border-amber-200', text: 'text-amber-900', light: 'bg-amber-100/40', accent: 'bg-amber-500', emoji: '🌅' }, // Sunrise
-        { bg: 'from-sky-50 to-cyan-50', border: 'border-sky-200', text: 'text-sky-900', light: 'bg-sky-100/40', accent: 'bg-sky-500', emoji: '🌊' }, // Ocean
-        { bg: 'from-emerald-50 to-teal-50', border: 'border-emerald-200', text: 'text-emerald-900', light: 'bg-emerald-100/40', accent: 'bg-emerald-500', emoji: '🌿' }, // Forest
-        { bg: 'from-rose-50 to-pink-50', border: 'border-rose-200', text: 'text-rose-900', light: 'bg-rose-100/40', accent: 'bg-rose-500', emoji: '🏜️' }, // Desert
-        { bg: 'from-purple-50 to-violet-50', border: 'border-purple-200', text: 'text-purple-900', light: 'bg-purple-100/40', accent: 'bg-purple-500', emoji: '⛰️' }, // Mountain
-        { bg: 'from-orange-50 to-red-50', border: 'border-orange-200', text: 'text-orange-900', light: 'bg-orange-100/40', accent: 'bg-orange-500', emoji: '🌅' }, // Sunset
-        { bg: 'from-indigo-50 to-blue-50', border: 'border-indigo-200', text: 'text-indigo-900', light: 'bg-indigo-100/40', accent: 'bg-indigo-500', emoji: '🌃' }, // Night
-        { bg: 'from-lime-50 to-green-50', border: 'border-lime-200', text: 'text-lime-900', light: 'bg-lime-100/40', accent: 'bg-lime-500', emoji: '🌴' }, // Tropical
-        { bg: 'from-fuchsia-50 to-pink-50', border: 'border-fuchsia-200', text: 'text-fuchsia-900', light: 'bg-fuchsia-100/40', accent: 'bg-fuchsia-500', emoji: '✨' }, // Magic
+        { bg: 'from-orange-100 to-amber-100', border: 'border-orange-400', text: 'text-orange-900', light: 'bg-orange-200/60', accent: 'bg-orange-500', emoji: '🌅' }, // Sunrise - Orange
+        { bg: 'from-blue-100 to-cyan-100', border: 'border-blue-400', text: 'text-blue-900', light: 'bg-blue-200/60', accent: 'bg-blue-500', emoji: '🌊' }, // Ocean - Blue
+        { bg: 'from-green-100 to-emerald-100', border: 'border-green-400', text: 'text-green-900', light: 'bg-green-200/60', accent: 'bg-green-500', emoji: '🌿' }, // Forest - Green
+        { bg: 'from-pink-100 to-rose-100', border: 'border-pink-400', text: 'text-pink-900', light: 'bg-pink-200/60', accent: 'bg-pink-500', emoji: '🏜️' }, // Desert - Pink
+        { bg: 'from-purple-100 to-violet-100', border: 'border-purple-400', text: 'text-purple-900', light: 'bg-purple-200/60', accent: 'bg-purple-500', emoji: '⛰️' }, // Mountain - Purple
+        { bg: 'from-red-100 to-orange-100', border: 'border-red-400', text: 'text-red-900', light: 'bg-red-200/60', accent: 'bg-red-500', emoji: '🌅' }, // Sunset - Red
+        { bg: 'from-indigo-100 to-blue-100', border: 'border-indigo-400', text: 'text-indigo-900', light: 'bg-indigo-200/60', accent: 'bg-indigo-500', emoji: '🌃' }, // Night - Indigo
+        { bg: 'from-lime-100 to-green-100', border: 'border-lime-400', text: 'text-lime-900', light: 'bg-lime-200/60', accent: 'bg-lime-500', emoji: '🌴' }, // Tropical - Lime
+        { bg: 'from-fuchsia-100 to-pink-100', border: 'border-fuchsia-400', text: 'text-fuchsia-900', light: 'bg-fuchsia-200/60', accent: 'bg-fuchsia-500', emoji: '✨' }, // Magic - Fuchsia
     ];
 
-    // Food color palette - light, appetizing colors
+    // Food color palette - vibrant, appetizing colors
     const mealColorPalette = {
-        breakfast: { bg: 'from-yellow-50 to-amber-50', border: 'border-amber-200', text: 'text-amber-900', badge: 'border-amber-300 bg-amber-50 text-amber-700', light: 'bg-amber-100/20' },
-        lunch: { bg: 'from-green-50 to-emerald-50', border: 'border-emerald-200', text: 'text-emerald-900', badge: 'border-emerald-300 bg-emerald-50 text-emerald-700', light: 'bg-emerald-100/20' },
-        dinner: { bg: 'from-indigo-50 to-purple-50', border: 'border-purple-200', text: 'text-purple-900', badge: 'border-purple-300 bg-purple-50 text-purple-700', light: 'bg-purple-100/20' },
+        breakfast: { bg: 'from-yellow-100 to-amber-100', border: 'border-yellow-400', text: 'text-yellow-900', badge: 'border-yellow-300 bg-yellow-100 text-yellow-800', light: 'bg-yellow-200/60' },
+        lunch: { bg: 'from-green-100 to-emerald-100', border: 'border-green-400', text: 'text-green-900', badge: 'border-green-300 bg-green-100 text-green-800', light: 'bg-green-200/60' },
+        dinner: { bg: 'from-purple-100 to-indigo-100', border: 'border-purple-400', text: 'text-purple-900', badge: 'border-purple-300 bg-purple-100 text-purple-800', light: 'bg-purple-200/60' },
     };
 
     const itineraryItems = Array.isArray(itineraryRaw)
@@ -437,7 +437,7 @@ function Itenary({trip, additionalCostBreakdown = {}, travelers = 1, expenseOnly
                                 const activityPlans = ensureMinimumActivities(rawActivityPlans, {
                                     dayIndex: index,
                                     destinationLabel: trip?.userSelection?.location?.label,
-                                });
+                                }).slice(0, 3);
                                 const mealMap = buildMeals(dayPlans, {
                                     dayIndex: index,
                                     destinationLabel: trip?.userSelection?.location?.label,
@@ -449,17 +449,17 @@ function Itenary({trip, additionalCostBreakdown = {}, travelers = 1, expenseOnly
 
                 return (
 
-                                <div key={`${dayLabel}-${index}`} className={`day-card rounded-3xl border-2 ${dayColor.border} bg-linear-to-br ${dayColor.bg} p-6 shadow-[0_20px_50px_-28px_rgba(15,23,42,0.35)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_40px_80px_-25px_rgba(79,70,229,0.35)] sm:p-7 slide-in-down`} style={{animationDelay: `${index * 0.1}s`}}>
-                                        <div className='mb-5 flex flex-wrap items-start justify-between gap-4 sm:items-center'>
+                                <div key={`${dayLabel}-${index}`} className={`day-card rounded-3xl border-2 ${dayColor.border} bg-gradient-to-br ${dayColor.bg} p-6 shadow-[0_20px_50px_-28px_rgba(15,23,42,0.35)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_40px_80px_-25px_rgba(79,70,229,0.35)] sm:p-7 slide-in-down`} style={{animationDelay: `${index * 0.1}s`}}>
+                                        <div className='mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
                                             <div className='flex items-center gap-3'>
                                                 <span className='text-4xl float-animation'>{dayColor.emoji}</span>
                                                 <div>
                                                     <h3 className={`text-2xl font-extrabold ${dayColor.text}`}>{dayLabel}</h3>
-                                                    <p className={`text-xs font-semibold ${dayColor.light} rounded px-2 py-1 inline-block mt-1`}>Day {index + 1} of {itineraryItems.length}</p>
+                                                    <p className={`text-xs font-semibold mt-1`}>Day {index + 1} of {itineraryItems.length}</p>
                                                 </div>
                                             </div>
-                                            <span className={`rounded-full border-2 ${dayColor.border} ${dayColor.light} px-4 py-2 text-xs font-bold ${dayColor.text}`}>
-                                                ✓ {activityPlans.length + 3} activities planned
+                                            <span className={`rounded-full border-2 ${dayColor.border} ${dayColor.light} px-4 py-2 text-xs font-bold ${dayColor.text} text-center`}>
+                                                ✓ {activityPlans.length + 3} activities
                                             </span>
                                         </div>
 
@@ -473,7 +473,7 @@ function Itenary({trip, additionalCostBreakdown = {}, travelers = 1, expenseOnly
                                                     return (
                                                         <div
                                                             key={`${dayLabel}-${mealType}`}
-                                                            className={`rounded-2xl bg-linear-to-br ${mealColor.bg} p-4 transition-all duration-500 transform-gpu hover:scale-105 hover:-translate-y-1 hover:shadow-[0_16px_32px_-12px] shadow-[0_8px_20px_-12px_rgba(0,0,0,0.08)] pulse-3d`}
+                                                            className={`rounded-2xl bg-gradient-to-br ${mealColor.bg} p-4 transition-all duration-500 transform-gpu hover:scale-105 hover:-translate-y-1 hover:shadow-[0_16px_32px_-12px] shadow-[0_8px_20px_-12px_rgba(0,0,0,0.08)] pulse-3d`}
                                                         >
                                                             <p className={`inline-flex rounded-full bg-white/70 border border-white/80 ${mealColor.text} px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide`}>
                                                                 {mealEmoji[mealType]} {mealType}
@@ -481,7 +481,7 @@ function Itenary({trip, additionalCostBreakdown = {}, travelers = 1, expenseOnly
 
                                                             {mealItem ? (
                                                                 <div className='mt-4 slide-in-up'>
-                                                                    <PlaceCard place={mealItem} />
+                                                                    <PlaceCard place={mealItem} themeColor={mealColor} />
                                                                 </div>
                                                             ) : (
                                                                 <div className={`mt-4 rounded-xl bg-white/40 backdrop-blur-sm p-4 text-sm font-medium ${mealColor.text}`}>
@@ -526,28 +526,31 @@ function Itenary({trip, additionalCostBreakdown = {}, travelers = 1, expenseOnly
                                             </div>
                                         </div>
 
-                    <div className='grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2'>
+                    <div className='mb-6'>
+                      <div className='mb-4 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center'>
+                        <h4 className={`text-lg font-extrabold ${dayColor.text} flex items-center gap-2`}>
+                          🎯 Top Attractions & Sightseeing
+                        </h4>
+                        <span className={`rounded-full border-2 ${dayColor.border} ${dayColor.light} px-3 py-1 text-xs font-semibold ${dayColor.text}`}>
+                          {activityPlans.length} places
+                        </span>
+                      </div>
+                      <div className='grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3'>
                                         {activityPlans.length ? activityPlans.map((plan, planIndex) => (
-                                                <div key={`${plan?.placeName || plan?.place || 'place'}-${planIndex}`} className={`rounded-2xl bg-linear-to-br ${dayColor.bg} p-4 transition-all duration-500 transform-gpu hover:scale-105 hover:-translate-y-2 hover:shadow-[0_20px_40px_-16px_rgba(0,0,0,0.1)] shadow-[0_8px_20px_-12px_rgba(0,0,0,0.08)] sm:p-5 slide-in-up`} style={{animationDelay: `${planIndex * 0.12}s`}}>
-                                                        <div className='mb-3 flex flex-wrap items-center gap-2'>
-                                                          <h3 className={`inline-flex rounded-full ${dayColor.light} px-4 py-2 text-xs font-bold uppercase tracking-wider ${dayColor.text}`}>
+                                                <div key={`${plan?.placeName || plan?.place || 'place'}-${planIndex}`} className='slide-in-up' style={{animationDelay: `${planIndex * 0.12}s`}}>
+                                                        <div className='mb-2 flex flex-wrap items-center gap-2'>
+                                                          <h3 className={`inline-flex rounded-full ${dayColor.light} px-3 py-1.5 text-xs font-bold uppercase tracking-wider ${dayColor.text}`}>
                                                               {getReadableVisitTime(plan, planIndex, activityPlans.length)}
                                                           </h3>
-                                                          <span className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold border-2 
-                                                            ${plan?.placeName?.toLowerCase().includes('hotel') || planIndex === 0 
-                                                              ? 'bg-blue-50 border-blue-300 text-blue-900' 
-                                                              : 'bg-purple-50 border-purple-300 text-purple-900'
-                                                            } shadow-sm`}>
-                                                            {getPlaceType(plan?.placeName, planIndex + 1)}
-                                                          </span>
                                                         </div>
-                            <PlaceCard place={plan}/>
+                            <PlaceCard place={plan} themeColor={dayColor} />
                         </div>
                                         )) : (
-                                            <div className={`md:col-span-2 rounded-2xl ${dayColor.light} p-6 text-center shadow-[0_4px_12px_-6px_rgba(0,0,0,0.04)]`}>
+                                            <div className={`md:col-span-2 lg:col-span-3 rounded-2xl ${dayColor.light} p-6 text-center shadow-[0_4px_12px_-6px_rgba(0,0,0,0.04)]`}>
                                                 <p className={`text-sm font-semibold ${dayColor.text}`}>✨ No sightseeing items for this day. Create custom activities to explore!</p>
                                             </div>
                                         )}
+                      </div>
                     </div>
 
                     

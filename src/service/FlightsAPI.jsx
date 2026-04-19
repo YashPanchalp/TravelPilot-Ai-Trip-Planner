@@ -2,6 +2,17 @@ import axios from 'axios';
 
 // Comprehensive city to airport code mapping - covers 500+ major global destinations
 const CITY_TO_AIRPORT = {
+  // Sri Lanka
+  'sri lanka': 'CMB',
+  'colombo': 'CMB',
+  'kandy': 'CMB',
+  'galle': 'CMB',
+  'hambantota': 'HRI',
+  'jaffna': 'JAF',
+  'trincomalee': 'TRR',
+  'batticaloa': 'BTC',
+  'sigiriya': 'KCT',
+
   // USA - Major Cities
   'new york': 'JFK',
   'new york city': 'JFK',
@@ -599,6 +610,20 @@ const getAirportCode = (location) => {
     .trim()
     .split(',')[0] // Take only city name
     .trim();
+
+  // Add explicit cases for Greece
+  const specialCases = {
+    'greece': 'ATH',
+    'athens': 'ATH',
+    'santorini': 'JTR',
+    'mykonos': 'JMK',
+    'crete': 'HER',
+    'rhodes': 'RHO', 
+  };
+  
+  if (specialCases[normalized]) {
+    return specialCases[normalized];
+  }
 
   // Check if already an airport code (3 uppercase letters)
   if (/^[A-Z]{3}$/.test(location.trim())) {

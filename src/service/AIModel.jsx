@@ -48,7 +48,7 @@ const apiKey = import.meta.env.VITE_GOOGLE_GENAI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
-  model: "gemini-3.1-flash-lite-preview",
+  model: "gemini-2.5-flash-lite",
 });
 
 const generationConfig = {
@@ -79,6 +79,63 @@ export const chatSession = model.startChat({
 });
 
 /**
+ * Send message with automatic model fallback and retry logic
+ * Tries multiple models in sequence with exponential backoff
+ */
+//try out all three models to resolve errors 
+export const sendMessageWithFallback = async (prompt) => {
+  const models = ['gemini-2.0-flash', 'gemini-2.5-flash-lite', 'gemini-3.1-flash-lite-preview'];
+  const maxRetries = 2;
+  const baseDelay = 1000; // 1 second base delay
+
+  for (const modelName of models) {
+    console.log(`🔄 Trying model: ${modelName}`);
+    
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        const currentModel = genAI.getGenerativeModel({
+          model: modelName,
+        });
+
+        const session = currentModel.startChat({
+          generationConfig,
+          history: chatSession.history || [],
+        });
+
+        const result = await session.sendMessage(prompt);
+        console.log(`✅ Success with model ${modelName} on attempt ${attempt + 1}`);
+        return result;
+      } catch (error) {
+        const isServerError = error?.status === 503 || error?.message?.includes('503');
+        const isQuotaError = error?.status === 429 || error?.message?.includes('429');
+        const isLastAttempt = attempt === maxRetries;
+        const isLastModel = modelName === models[models.length - 1];
+
+        if (isServerError || isQuotaError) {
+          if (!isLastAttempt) {
+            // Exponential backoff: 1s, 2s, 4s
+            const delayMs = baseDelay * Math.pow(2, attempt);
+            console.warn(`⚠️ ${modelName} attempt ${attempt + 1} failed (${error?.status}). Retrying in ${delayMs}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delayMs));
+          } else if (!isLastModel) {
+            console.warn(`⚠️ ${modelName} failed after ${maxRetries + 1} attempts. Trying next model...`);
+          } else {
+            console.error(`❌ All models failed after retries. Last error:`, error?.message);
+            throw new Error(`Trip generation failed after trying all models: ${error?.message}`);
+          }
+        } else {
+          // Non-recoverable error
+          console.error(`❌ Fatal error with ${modelName}:`, error?.message);
+          throw error;
+        }
+      }
+    }
+  }
+
+  throw new Error('All models exhausted without successful response');
+};
+
+/**
  * Get airport code for a location using Gemini AI
  * @param {string} location - City or location name
  * @returns {Promise<string>} Airport code (3-letter IATA code)
@@ -98,7 +155,7 @@ export const getAirportCodeFromGemini = async (location) => {
 
     // Create a simple model for just this task
     const airportModel = genAI.getGenerativeModel({
-      model: "gemini-3.1-flash-lite-preview",
+      model: "gemma-3-27b-it",
     });
 
     const prompt = `You are an expert in airport codes. Given a city or location name, return ONLY the 3-letter IATA airport code for the main international airport in that location. 
@@ -149,7 +206,7 @@ export const getLocalTransportGuide = async ({ city, date, startTime, dayItinera
     const transportGenAI = new GoogleGenerativeAI(travelApiKey);
 
     const transportModel = transportGenAI.getGenerativeModel({
-      model: "gemini-3.1-flash-lite-preview",
+      model: "gemma-3-27b-it",
     });
 
     const transportPrompt = `You are an intelligent Travel Route, Time & Cost Planner.
