@@ -21,12 +21,21 @@ export default async function handler(req, res) {
       });
     }
 
-    const apiKey = process.env.VITE_FLIGHTS_API_SERA;
+    // Check for API key - support multiple env variable names
+    const apiKey = process.env.FLIGHTS_API_SERPAPI || 
+                   process.env.SERPAPI_KEY || 
+                   process.env.VITE_FLIGHTS_API_SERPAPI;
+    
     if (!apiKey) {
+      console.error('❌ API key not found in environment variables');
+      console.error('Available env keys:', Object.keys(process.env).filter(k => k.includes('FLIGHT') || k.includes('SERP')));
       return res.status(500).json({ 
-        error: 'API key not configured on server' 
+        error: 'API key not configured on server',
+        detail: 'Missing FLIGHTS_API_SERPAPI environment variable'
       });
     }
+
+    console.log(`✅ Using API key: ${apiKey.substring(0, 5)}...`);
 
     // Build SerpAPI request parameters
     const params = new URLSearchParams({
@@ -44,6 +53,8 @@ export default async function handler(req, res) {
       params.append('return_date', return_date);
     }
 
+    console.log(`📡 Calling SerpAPI for: ${departure} → ${arrival} on ${outbound_date}`);
+
     // Make request to SerpAPI
     const response = await fetch(`https://serpapi.com/search?${params}`, {
       method: 'GET',
@@ -52,8 +63,12 @@ export default async function handler(req, res) {
       },
     });
 
+    console.log(`SerpAPI Response Status: ${response.status}`);
+
     if (!response.ok) {
-      throw new Error(`SerpAPI returned status ${response.status}`);
+      const errorText = await response.text();
+      console.error(`❌ SerpAPI Error: ${response.status}`, errorText);
+      throw new Error(`SerpAPI returned status ${response.status}: ${errorText}`);
     }
 
     const data = await response.json();
@@ -64,7 +79,7 @@ export default async function handler(req, res) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Flight API Error:', error);
+    console.error('❌ Flight API Error:', error?.message || error);
     return res.status(500).json({
       success: false,
       error: error?.message || 'Failed to fetch flights',
