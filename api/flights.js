@@ -73,7 +73,7 @@ export default async function handler(req, res) {
       outbound_date,
       currency,
       adults: String(adults),
-      type: return_date ? 'roundtrip' : 'oneWay',
+      type: return_date ? '1' : '2',
     });
 
     if (return_date) {
