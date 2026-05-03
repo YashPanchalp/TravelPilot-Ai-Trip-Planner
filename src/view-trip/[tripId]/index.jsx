@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/service/firebaseConfig'; // adjust path if different
 import { toast } from 'sonner';
 import { useState } from 'react';
@@ -30,12 +30,16 @@ function ViewTrip() {
      tripId && GetTripData();
    }, [tripId])
 
-   // Set first hotel as default when trip data loads
+   // Set first hotel as default and load cost breakdown when trip data loads
    useEffect(() => {
      if (tripData?.tripData?.hotels && tripData.tripData.hotels.length > 0) {
        const firstHotel = tripData.tripData.hotels[0];
        const noOfDays = tripData?.userSelection?.noOfDays || 1;
        handleHotelSelection(firstHotel, noOfDays);
+     }
+     // Load saved cost breakdown from Firestore
+     if (tripData?.tripData?.costBreakdown) {
+       setCostBreakdown(tripData.tripData.costBreakdown);
      }
    }, [tripData?.tripData?.hotels?.length])
 
@@ -70,10 +74,25 @@ const handleFlightSelection = (outbound, returnFlight) => {
   const travelers = tripData?.userSelection?.travelers || 1;
   const costPerPerson = Math.round(flightCost / travelers);
   
-  setCostBreakdown(prev => ({
-    ...prev,
+  const updatedBreakdown = {
+    ...costBreakdown,
     travelFlightInr: flightCost,
-  }));
+  };
+  
+  setCostBreakdown(updatedBreakdown);
+  
+  // Save to Firestore
+  const updateTrip = async () => {
+    try {
+      const tripRef = doc(db, 'AiTrips', tripId);
+      await updateDoc(tripRef, {
+        'tripData.costBreakdown': updatedBreakdown,
+      });
+    } catch (error) {
+      console.error('Error saving flight selection:', error);
+    }
+  };
+  updateTrip();
   
   toast.success(`✈️ Flight selected! Added ₹${flightCost.toLocaleString('en-IN')} to expenses${travelers > 1 ? ` (₹${costPerPerson.toLocaleString('en-IN')} per person)` : ''}`);
 };
@@ -87,10 +106,25 @@ const handleHotelSelection = (hotel, noOfDays) => {
   const travelers = tripData?.userSelection?.travelers || 1;
   const costPerPerson = Math.round(totalHotelCost / travelers);
   
-  setCostBreakdown(prev => ({
-    ...prev,
+  const updatedBreakdown = {
+    ...costBreakdown,
     hotelCostInr: totalHotelCost,
-  }));
+  };
+  
+  setCostBreakdown(updatedBreakdown);
+  
+  // Save to Firestore
+  const updateTrip = async () => {
+    try {
+      const tripRef = doc(db, 'AiTrips', tripId);
+      await updateDoc(tripRef, {
+        'tripData.costBreakdown': updatedBreakdown,
+      });
+    } catch (error) {
+      console.error('Error saving hotel selection:', error);
+    }
+  };
+  updateTrip();
   
   toast.success(`🏨 Hotel selected! Added ₹${totalHotelCost.toLocaleString('en-IN')} (₹${hotelPrice}/day × ${noOfDays} days)${travelers > 1 ? ` - ₹${costPerPerson.toLocaleString('en-IN')} per person` : ''} to expenses`);
 };

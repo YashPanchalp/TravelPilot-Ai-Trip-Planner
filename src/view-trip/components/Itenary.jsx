@@ -11,22 +11,16 @@ function Itenary({trip, additionalCostBreakdown = {}, travelers = 1, expenseOnly
       ...additionalCostBreakdown,
     };
     const dayColorPalette = [
-        { bg: 'from-orange-100 to-amber-100', border: 'border-orange-400', text: 'text-orange-900', light: 'bg-orange-200/60', accent: 'bg-orange-500', emoji: '🌅' }, // Sunrise - Orange
-        { bg: 'from-blue-100 to-cyan-100', border: 'border-blue-400', text: 'text-blue-900', light: 'bg-blue-200/60', accent: 'bg-blue-500', emoji: '🌊' }, // Ocean - Blue
-        { bg: 'from-green-100 to-emerald-100', border: 'border-green-400', text: 'text-green-900', light: 'bg-green-200/60', accent: 'bg-green-500', emoji: '🌿' }, // Forest - Green
-        { bg: 'from-pink-100 to-rose-100', border: 'border-pink-400', text: 'text-pink-900', light: 'bg-pink-200/60', accent: 'bg-pink-500', emoji: '🏜️' }, // Desert - Pink
-        { bg: 'from-purple-100 to-violet-100', border: 'border-purple-400', text: 'text-purple-900', light: 'bg-purple-200/60', accent: 'bg-purple-500', emoji: '⛰️' }, // Mountain - Purple
-        { bg: 'from-red-100 to-orange-100', border: 'border-red-400', text: 'text-red-900', light: 'bg-red-200/60', accent: 'bg-red-500', emoji: '🌅' }, // Sunset - Red
-        { bg: 'from-indigo-100 to-blue-100', border: 'border-indigo-400', text: 'text-indigo-900', light: 'bg-indigo-200/60', accent: 'bg-indigo-500', emoji: '🌃' }, // Night - Indigo
-        { bg: 'from-lime-100 to-green-100', border: 'border-lime-400', text: 'text-lime-900', light: 'bg-lime-200/60', accent: 'bg-lime-500', emoji: '🌴' }, // Tropical - Lime
-        { bg: 'from-fuchsia-100 to-pink-100', border: 'border-fuchsia-400', text: 'text-fuchsia-900', light: 'bg-fuchsia-200/60', accent: 'bg-fuchsia-500', emoji: '✨' }, // Magic - Fuchsia
+        { bg: 'from-indigo-50 to-blue-50', border: 'border-indigo-200', text: 'text-indigo-900', light: 'bg-indigo-100/50', accent: 'bg-indigo-500', emoji: '🗺️' },
+        { bg: 'from-blue-50 to-slate-50', border: 'border-blue-200', text: 'text-blue-900', light: 'bg-blue-100/50', accent: 'bg-blue-500', emoji: '🗺️' },
+        { bg: 'from-slate-50 to-indigo-50', border: 'border-slate-200', text: 'text-slate-900', light: 'bg-slate-100/50', accent: 'bg-slate-500', emoji: '🗺️' },
     ];
 
-    // Food color palette - vibrant, appetizing colors
+    // Simplified meal color palette - subtle colors
     const mealColorPalette = {
-        breakfast: { bg: 'from-yellow-100 to-amber-100', border: 'border-yellow-400', text: 'text-yellow-900', badge: 'border-yellow-300 bg-yellow-100 text-yellow-800', light: 'bg-yellow-200/60' },
-        lunch: { bg: 'from-green-100 to-emerald-100', border: 'border-green-400', text: 'text-green-900', badge: 'border-green-300 bg-green-100 text-green-800', light: 'bg-green-200/60' },
-        dinner: { bg: 'from-purple-100 to-indigo-100', border: 'border-purple-400', text: 'text-purple-900', badge: 'border-purple-300 bg-purple-100 text-purple-800', light: 'bg-purple-200/60' },
+        breakfast: { bg: 'from-slate-50 to-slate-100', border: 'border-slate-200', text: 'text-slate-900', badge: 'border-slate-200 bg-slate-50 text-slate-700', light: 'bg-slate-100/50' },
+        lunch: { bg: 'from-slate-50 to-slate-100', border: 'border-slate-200', text: 'text-slate-900', badge: 'border-slate-200 bg-slate-50 text-slate-700', light: 'bg-slate-100/50' },
+        dinner: { bg: 'from-slate-50 to-slate-100', border: 'border-slate-200', text: 'text-slate-900', badge: 'border-slate-200 bg-slate-50 text-slate-700', light: 'bg-slate-100/50' },
     };
 
     const itineraryItems = Array.isArray(itineraryRaw)
@@ -202,37 +196,82 @@ function Itenary({trip, additionalCostBreakdown = {}, travelers = 1, expenseOnly
 
         const buildLocalFallbackActivity = ({ dayIndex, destinationLabel, existingActivities = [] }) => {
             const city = String(destinationLabel || 'Local').split(',')[0].trim() || 'Local';
-            const nearby = existingActivities[dayIndex % Math.max(existingActivities.length, 1)]?.placeName || city;
 
+            // Popular tourist attractions pool - Must-visit & mostly visited places
             const activityPool = [
+                // Morning activities
                 {
-                    placeName: `${city} Old Town Walk`,
-                    placeDetails: `Explore heritage streets, markets, and local architecture around ${nearby}.`,
-                    time: '10:00 AM',
+                    placeName: `${city} Main Market & Shopping Hub`,
+                    placeDetails: `Explore the vibrant main market with local crafts, souvenirs, and authentic shopping experience. A must-visit for authentic souvenirs.`,
+                    time: '9:00 AM',
                     timeToVisit: 'Morning',
+                    ticketPricing: '₹0 - 500',
+                },
+                {
+                    placeName: `${city} Major Temple / Sacred Site`,
+                    placeDetails: `Visit the iconic religious landmark. Spectacular architecture and spiritual significance. A must-see attraction.`,
+                    time: '8:00 AM',
+                    timeToVisit: 'Morning',
+                    ticketPricing: '₹0 - 300',
+                },
+                {
+                    placeName: `${city} Central Park / Garden`,
+                    placeDetails: `Serene green space perfect for morning walks. Lush landscapes, photo opportunities, and peaceful ambiance.`,
+                    time: '7:00 AM',
+                    timeToVisit: 'Morning',
+                    ticketPricing: '₹0 - 100',
+                },
+                // Afternoon activities
+                {
+                    placeName: `${city} Famous Museum / Heritage Site`,
+                    placeDetails: `Explore fascinating collections and exhibits. Learn about history, art, and culture. Top-rated tourist attraction.`,
+                    time: '12:00 PM',
+                    timeToVisit: 'Afternoon',
+                    ticketPricing: '₹150 - 500',
+                },
+                {
+                    placeName: `${city} Central Square / Monument`,
+                    placeDetails: `Iconic landmark and gathering place. Historical significance with bustling atmosphere. Essential photo spot.`,
+                    time: '1:00 PM',
+                    timeToVisit: 'Afternoon',
                     ticketPricing: '₹0 - 200',
                 },
                 {
-                    placeName: `${city} Local Art & Culture Spot`,
-                    placeDetails: `A cultural stop with local stories, crafts, and photo-friendly spaces in ${city}.`,
-                    time: '2:00 PM',
+                    placeName: `${city} Adventure Activity / Water Sports`,
+                    placeDetails: `Thrilling outdoor activity perfect for adventure seekers. Popular experience that travelers love.`,
+                    time: '2:30 PM',
                     timeToVisit: 'Afternoon',
-                    ticketPricing: '₹100 - 400',
+                    ticketPricing: '₹300 - 1000',
                 },
+                // Evening activities
                 {
-                    placeName: `${city} Sunset Viewpoint`,
-                    placeDetails: `Catch evening views and local vibe near ${nearby}. Great for a relaxed end to the day.`,
-                    time: '6:30 PM',
+                    placeName: `${city} Scenic Viewpoint / Hilltop`,
+                    placeDetails: `Panoramic city views and stunning sunset. Most recommended spot for evening photography and sunset viewing.`,
+                    time: '5:30 PM',
                     timeToVisit: 'Evening',
                     ticketPricing: '₹0 - 300',
+                },
+                {
+                    placeName: `${city} River Walk / Waterfront Promenade`,
+                    placeDetails: `Beautiful riverside walk with shops, cafes, and entertainment. Perfect evening destination for relaxation.`,
+                    time: '6:00 PM',
+                    timeToVisit: 'Evening',
+                    ticketPricing: '₹0 - 200',
+                },
+                {
+                    placeName: `${city} Evening Market / Bazaar`,
+                    placeDetails: `Bustling evening market with street food, shopping, and entertainment. Authentic local experience.`,
+                    time: '6:30 PM',
+                    timeToVisit: 'Evening',
+                    ticketPricing: '₹100 - 600',
                 },
             ];
 
             const picked = activityPool[dayIndex % activityPool.length];
             return {
                 ...picked,
-                placeAddress: `${nearby}, ${city}`,
-                timeToTravel: '10-30 mins',
+                placeAddress: `${city}, Popular Tourist Area`,
+                timeToTravel: '15-40 mins',
                 placeImageUrl: '',
                 geoCoordinates: '',
             };
@@ -407,7 +446,7 @@ function Itenary({trip, additionalCostBreakdown = {}, travelers = 1, expenseOnly
 
   return (
 
-        <section className='w-full rounded-3xl border border-slate-200 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.17),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.14),transparent_35%),#ffffff] p-4 shadow-[0_28px_74px_-30px_rgba(15,23,42,0.45)] backdrop-blur sm:rounded-4xl sm:p-8'>
+        <section className='w-full rounded-3xl border border-slate-200 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.12),transparent_38%),radial-gradient(circle_at_bottom_right,rgba(99,102,241,0.12),transparent_45%),#ffffff] p-4 shadow-[0_26px_70px_-28px_rgba(15,23,42,0.42)] backdrop-blur sm:rounded-4xl sm:p-8'>
             <style>{`
               @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
               @keyframes shimmer { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
