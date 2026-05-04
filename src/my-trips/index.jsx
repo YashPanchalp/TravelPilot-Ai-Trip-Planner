@@ -6,7 +6,9 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { GetPlaceDetails, PHOTO_REF_URL } from '@/service/GlobalAPI';
 import {
+  BarChart3,
   Calendar,
+  ChevronLeft,
   CheckCircle2,
   Clock3,
   Eye,
@@ -17,6 +19,7 @@ import {
   Share2,
   Trash2,
   Users,
+  X,
 } from 'lucide-react';
 
 function MyTrips() {
@@ -26,6 +29,7 @@ function MyTrips() {
   const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [tripCoverImages, setTripCoverImages] = useState({});
+  const [showMobileAnalytics, setShowMobileAnalytics] = useState(false);
 
   const fallbackImage = 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1200&q=80&auto=format&fit=crop';
 
@@ -353,8 +357,20 @@ function MyTrips() {
     <section className='min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 px-0 py-8'>
       <div className='mx-auto flex max-w-full gap-6 px-4 sm:px-8 md:px-12 lg:px-16'>
         {/* Left Sidebar - Analytics */}
-        <aside className='hidden w-96 flex-shrink-0 overflow-y-auto lg:block max-h-screen'>
-          <div className='sticky top-8 space-y-5'>
+        <aside className={`${
+          showMobileAnalytics
+            ? 'fixed inset-0 z-50 w-screen overflow-y-auto lg:static lg:z-auto lg:w-96 lg:inset-auto'
+            : 'hidden'
+        } lg:block w-96 flex-shrink-0 max-h-screen`}>
+          <div className='sticky top-0 z-10 space-y-5 bg-white lg:bg-transparent p-4 sm:p-6 lg:p-0 rounded-t-3xl lg:rounded-none lg:static relative mb-4'>
+            {/* Back Button for Mobile */}
+            <button
+              onClick={() => setShowMobileAnalytics(false)}
+              className='flex lg:hidden items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors text-slate-700 font-semibold'
+            >
+              <ChevronLeft className='h-5 w-5' />
+              Back to Trips
+            </button>
             {/* Stats Cards */}
             <div className='rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_14px_35px_-22px_rgba(15,23,42,0.35)] backdrop-blur'>
               <h3 className='mb-4 text-lg font-extrabold text-slate-900'>Quick Stats</h3>
@@ -533,6 +549,15 @@ function MyTrips() {
             + Plan New Trip
           </Button>
         </div>
+
+        {/* Analytics Toggle Button - Mobile Only */}
+        <button
+          onClick={() => setShowMobileAnalytics(true)}
+          className='mb-6 flex lg:hidden w-full items-center justify-center gap-2 h-11 rounded-xl border border-slate-200 bg-gradient-to-r from-blue-50 to-violet-50 px-4 font-semibold text-slate-700 transition-all hover:border-blue-300 hover:shadow-md'
+        >
+          <BarChart3 className='h-5 w-5 text-blue-600' />
+          Show Analytics
+        </button>
 
         {/* Search and Filter */}
         <div className='mb-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_14px_35px_-22px_rgba(15,23,42,0.35)]'>
