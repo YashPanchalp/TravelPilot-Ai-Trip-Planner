@@ -155,7 +155,7 @@ export const getAirportCodeFromGemini = async (location) => {
 
     // Create a simple model for just this task
     const airportModel = genAI.getGenerativeModel({
-      model: "gemma-3-27b-it",
+      model: "gemini-2.0-flash",
     });
 
     const prompt = `You are an expert in airport codes. Given a city or location name, return ONLY the 3-letter IATA airport code for the main international airport in that location. 
@@ -204,10 +204,7 @@ export const getLocalTransportGuide = async ({ city, date, startTime, dayItinera
 
     const travelApiKey = import.meta.env.VITE_GOOGLE_GENAI_API_KEY || import.meta.env.TRIP_LOCAL_TRAVEL_API_KEY;
     const transportGenAI = new GoogleGenerativeAI(travelApiKey);
-
-    const transportModel = transportGenAI.getGenerativeModel({
-      model: "gemma-3-27b-it",
-    });
+    const transportModels = ['gemini-3.1-flash-lite-preview', 'gemini-2.5-flash-lite', 'gemini-2.0-flash'];
 
     const transportPrompt = `You are an intelligent Travel Route, Time & Cost Planner.
 
@@ -257,7 +254,27 @@ Return as JSON with:
   }
 }`;
 
-    const result = await transportModel.generateContent(transportPrompt);
+    // Try models with fallback
+    let result = null;
+    let lastError = null;
+
+    for (const modelName of transportModels) {
+      try {
+        console.log(`🔄 Trying transport guide model: ${modelName}`);
+        const transportModel = transportGenAI.getGenerativeModel({ model: modelName });
+        result = await transportModel.generateContent(transportPrompt);
+        console.log(`✅ Success with transport model ${modelName}`);
+        break; // Success, exit the loop
+      } catch (error) {
+        lastError = error;
+        console.warn(`⚠️ Transport model ${modelName} failed:`, error?.message);
+        // Continue to next model
+      }
+    }
+
+    if (!result) {
+      throw lastError || new Error('All transport guide models failed');
+    }
     const responseText = result.response.text();
 
     // Parse JSON from response
