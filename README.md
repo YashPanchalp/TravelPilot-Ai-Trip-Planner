@@ -1,0 +1,78 @@
+<div align="center">
+
+# 🌍 AI Trip Planner 🌍
+
+<img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTlnaDVrdGFscHpwaGQwaWQ1dGszcjJxaTB6bWR5enozZWNyOGRseCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/kHg1Xl0b8C40Y1wK3V/giphy.gif" alt="Travel Animation" width="400"/>
+
+**Your Intelligent Travel Companion**
+
+<p>
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E" alt="Vite" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="TailwindCSS" />
+  <img src="https://img.shields.io/badge/firebase-ffca28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase" />
+</p>
+
+</div>
+
+---
+
+## ✨ Features ✨
+
+### 🤖 AI-Generated Day-by-Day Itineraries
+Generates personalized, budget-conscious daily plans. Recommends authentic local eateries, detailed sightseeing agendas with geo-coordinates, and practical budget estimates for accommodations and activities.
+
+### 🏨 Curated Hotel Recommendations
+Features 8-12 tailored hotel options complete with addresses, pricing, coordinates, ratings, and descriptions to match your specific budget (Pocket Friendly, Moderate, or Luxury).
+
+### ✈️ Real-Time Flights
+Integrated directly with SerpAPI to search for outbound and return flights globally, leveraging a comprehensive database of 500+ IATA airport codes to map destinations automatically.
+
+### 🛡️ Smart Travel Advisory
+Provides up-to-date, destination-specific insights regarding security alerts, visa rules, cultural etiquette, recent local events, health precautions, and practical transport tips.
+
+### 🔐 Secure User Accounts
+Powered by Google Firebase, securely authenticate users so they can permanently save, retrieve, and view detailed past travel plans under their "My Trips" dashboard.
+
+---
+
+## 🚀 Getting Started
+
+Follow these steps to explore the world with AI locally.
+
+### 1️⃣ Clone & Install
+```bash
+# Clone the repository
+git clone https://github.com/your-username/ai-trip-planner.git
+
+# Move into the project directory
+cd ai-trip-planner/ai-tip-planner
+
+# Install all dependencies
+npm install
+```
+
+### 2️⃣ Configure Environment
+Create a `.env.local` file and add your API keys:
+```env
+VITE_GOOGLE_PLACE_API_KEY=your_google_maps_key
+VITE_GOOGLE_GEMINI_AI_API_KEY=your_gemini_key
+VITE_FIREBASE_API_KEY=your_firebase_key
+FLIGHTS_API_SERPAPI=your_serpapi_key
+```
+
+### 3️⃣ Launch
+```bash
+# Start your local Vite dev server
+npm run dev
+```
+
+---
+
+## 🛠️ Built With
+
+- **Frontend:** [React](https://reactjs.org/) (Vite), [Tailwind CSS](https://tailwindcss.com/)
+- **UI Components:** [Radix UI](https://www.radix-ui.com/), [Lucide Icons](https://lucide.dev/)
+- **Backend/Auth:** [Firebase](https://firebase.google.com/)
+- **Routing:** [React Router](https://reactrouter.com/)
+- **AI & Integrations:** Google Generative AI (Gemini), Google Places API, and SerpAPI (Flights)
